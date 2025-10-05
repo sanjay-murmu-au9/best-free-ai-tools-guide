@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>AI Tools Hub API Test</h1>
+    <button onclick="testAPI()">Test API Connection</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/tools');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <h2>✅ API Working!</h2>
+                        <p>Found ${data.data.length} tools</p>
+                        <h3>Sample Tools:</h3>
+                        <ul>
+                            ${data.data.slice(0, 3).map(tool => 
+                                `<li><strong>${tool.name}</strong> - ${tool.category.name}</li>`
+                            ).join('')}
+                        </ul>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '❌ API Error: ' + data.error;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Connection Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
