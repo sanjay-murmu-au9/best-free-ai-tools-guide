@@ -31,52 +31,34 @@ interface User {
   full_name?: string;
 }
 
-// API Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
-
-// API Service
-class ApiService {
-  async get<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    return result.data;
-  }
-}
-
-const apiService = new ApiService();
+// Mock Data
+import { mockTools, categories as mockCategories } from './lib/mockData';
 
 // Data Hooks
-const useTools = (searchQuery: string, selectedCategory: string | null, categories: Category[]) => {
+const useTools = (searchQuery: string, selectedCategory: string | null) => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTools = async () => {
-      try {
-        setLoading(true);
-        const params = new URLSearchParams();
-        if (searchQuery) params.append('search', searchQuery);
-        if (selectedCategory) {
-          // Find category slug by ID
-          const categorySlug = categories.find(c => c.id === selectedCategory)?.slug;
-          if (categorySlug) params.append('category', categorySlug);
-        }
-        
-        const data = await apiService.get<Tool[]>(`/tools?${params.toString()}`);
-        setTools(data);
-      } catch (err) {
-        console.error('Failed to fetch tools:', err);
-        setTools([]);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    setTimeout(() => {
+      let filteredTools = mockTools;
+      
+      if (searchQuery) {
+        filteredTools = filteredTools.filter(tool => 
+          tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
       }
-    };
-
-    fetchTools();
-  }, [searchQuery, selectedCategory, categories]);
+      
+      if (selectedCategory) {
+        filteredTools = filteredTools.filter(tool => tool.category.id === selectedCategory);
+      }
+      
+      setTools(filteredTools);
+      setLoading(false);
+    }, 300);
+  }, [searchQuery, selectedCategory]);
 
   return { tools, loading };
 };
@@ -86,18 +68,10 @@ const useCategories = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await apiService.get<Category[]>('/categories');
-        setCategories(data);
-      } catch (err) {
-        console.error('Failed to fetch categories:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
+    setTimeout(() => {
+      setCategories(mockCategories);
+      setLoading(false);
+    }, 100);
   }, []);
 
   return { categories, loading };
@@ -426,7 +400,7 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { categories, loading: categoriesLoading } = useCategories();
-  const { tools, loading: toolsLoading } = useTools(searchQuery, selectedCategory, categories);
+  const { tools, loading: toolsLoading } = useTools(searchQuery, selectedCategory);
 
   return (
     <div className="min-h-screen bg-gray-50">
