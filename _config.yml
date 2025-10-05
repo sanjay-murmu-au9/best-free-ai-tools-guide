@@ -1,0 +1,15 @@
+exclude:
+  - node_modules/
+  - backend/
+  - package.json
+  - package-lock.json
+  - .gitignore
+  - README.md
+  - src/
+  - public/
+  - vite.config.ts
+  - tsconfig.json
+  - tailwind.config.js
+  - postcss.config.js
+  - .env*
+  - dist/
