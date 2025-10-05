@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { StarIcon, HeartIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
-import { api } from '../lib/api';
+import { mockTools } from '../lib/mockData';
 import { Tool } from '../types';
 
 import ToolOverview from '../components/ToolOverview';
@@ -14,18 +14,13 @@ export default function ToolDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTool = async () => {
-      if (!id) return;
-      try {
-        const toolData = await api.getToolById(id);
-        setTool(toolData);
-      } catch (error) {
-        console.error('Failed to fetch tool:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTool();
+    if (!id) return;
+    setLoading(true);
+    setTimeout(() => {
+      const toolData = mockTools.find(t => t.id === id);
+      setTool(toolData || null);
+      setLoading(false);
+    }, 300);
   }, [id]);
 
   if (loading) {

@@ -563,7 +563,7 @@ const Favorites: React.FC = () => {
 const AppWrapper: React.FC = () => {
   return (
     <AuthProvider>
-      <Router future={{ v7_relativeSplatPath: true }}>
+      <Router basename="/best-free-ai-tools-guide" future={{ v7_relativeSplatPath: true }}>
         <div className="min-h-screen bg-gray-50">
           <Header />
           <Routes>
