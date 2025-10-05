@@ -52,4 +52,5 @@ export interface Favorite {
   user_id: string;
   tool_id: string;
   created_at: string;
+  tool?: Tool;
 }

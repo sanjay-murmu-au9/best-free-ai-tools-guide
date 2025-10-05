@@ -70,7 +70,7 @@ export default function Favorites() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favorites.map(favorite => (
-              <ToolCard key={favorite.id} tool={favorite.tool} />
+              <ToolCard key={favorite.id} tool={favorite.tool!} />
             ))}
           </div>
         )}

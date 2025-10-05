@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ToolDetailPage from './pages/ToolDetail';
 import Newsletter from './components/Newsletter';
 import { supabase } from './lib/supabase';
@@ -103,28 +103,7 @@ const useCategories = () => {
   return { categories, loading };
 };
 
-const useTool = (id: string) => {
-  const [tool, setTool] = useState<Tool | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTool = async () => {
-      try {
-        const data = await apiService.get<Tool>(`/tools/${id}`);
-        setTool(data);
-      } catch (err) {
-        console.error('Failed to fetch tool:', err);
-        setTool(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchTool();
-  }, [id]);
-
-  return { tool, loading };
-};
 
 // Auth Context
 interface AuthContextType {
@@ -173,7 +152,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: window.location.origin

@@ -3,7 +3,7 @@ import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
 import ToolCard from '../components/ToolCard';
 import Newsletter from '../components/Newsletter';
-import { mockTools, categories } from '../lib/mockData';
+import { mockTools, categories as mockCategories } from '../lib/mockData';
 import { Tool, Category } from '../types';
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     // Using mock data temporarily
     setTools(mockTools);
-    setCategories(categories);
+    setCategories(mockCategories);
     setLoading(false);
   }, []);
 
@@ -71,39 +71,41 @@ export default function Home() {
               <p className="text-gray-500 text-lg">Loading tools...</p>
             </div>
           ) : (
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-              {selectedCategory 
-                ? `${categories.find(c => c.id === selectedCategory)?.name} Tools` 
-                : searchQuery 
-                ? 'Search Results'
-                : 'All AI Tools'
-              }
-            </h2>
-            <p className="text-gray-600">
-              {searchQuery 
-                ? `${filteredTools.length} tools found for "${searchQuery}"`
-                : `${filteredTools.length} tools found`
-              }
-            </p>
-          </div>
+            <>
+              <div className="mb-6 sm:mb-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                  {selectedCategory 
+                    ? `${categories.find(c => c.id === selectedCategory)?.name} Tools` 
+                    : searchQuery 
+                    ? 'Search Results'
+                    : 'All AI Tools'
+                  }
+                </h2>
+                <p className="text-gray-600">
+                  {searchQuery 
+                    ? `${filteredTools.length} tools found for "${searchQuery}"`
+                    : `${filteredTools.length} tools found`
+                  }
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredTools.map(tool => (
-              <ToolCard key={tool.id} tool={tool} />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {filteredTools.map(tool => (
+                  <ToolCard key={tool.id} tool={tool} />
+                ))}
+              </div>
 
-          {filteredTools.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                {searchQuery 
-                  ? `No tools found matching "${searchQuery}".`
-                  : 'No tools found matching your criteria.'
-                }
-              </p>
-            </div>
-          )}
+              {filteredTools.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">
+                    {searchQuery 
+                      ? `No tools found matching "${searchQuery}".`
+                      : 'No tools found matching your criteria.'
+                    }
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

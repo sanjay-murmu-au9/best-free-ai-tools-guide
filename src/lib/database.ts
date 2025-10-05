@@ -49,7 +49,7 @@ export const reviewsService = {
       .from('reviews')
       .select(`
         *,
-        user:auth.users(email)
+        user:profiles(email)
       `)
       .eq('tool_id', toolId)
       .order('created_at', { ascending: false });
