@@ -2,7 +2,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { StarIcon, HeartIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
-import { mockTools } from '../lib/mockData';
+const API_BASE_URL = 'https://digldzbwgoqnwuhpdjuw.supabase.co/functions/v1';
+const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZ2xkemJ3Z29xbnd1aHBkanV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODc1MjYsImV4cCI6MjA3NDY2MzUyNn0.qVYryQjm8fpvnrA8TMl6DrP_NQREx3vaD518LClY6J8';
 import { Tool } from '../types';
 
 import ToolOverview from '../components/ToolOverview';
@@ -14,13 +15,27 @@ export default function ToolDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setTimeout(() => {
-      const toolData = mockTools.find(t => t.id === id);
-      setTool(toolData || null);
-      setLoading(false);
-    }, 300);
+    const fetchTool = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/tools/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error('Tool not found');
+        const result = await response.json();
+        setTool(result.data);
+      } catch (error) {
+        console.error('Failed to fetch tool:', error);
+        setTool(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTool();
   }, [id]);
 
   if (loading) {

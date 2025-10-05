@@ -31,8 +31,27 @@ interface User {
   full_name?: string;
 }
 
-// Mock Data
-import { mockTools, categories as mockCategories } from './lib/mockData';
+// API Service
+const API_BASE_URL = 'https://digldzbwgoqnwuhpdjuw.supabase.co/functions/v1';
+const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZ2xkemJ3Z29xbnd1aHBkanV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODc1MjYsImV4cCI6MjA3NDY2MzUyNn0.qVYryQjm8fpvnrA8TMl6DrP_NQREx3vaD518LClY6J8';
+
+class ApiService {
+  async get<T>(endpoint: string): Promise<T> {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    return result.data;
+  }
+}
+
+const apiService = new ApiService();
 
 // Data Hooks
 const useTools = (searchQuery: string, selectedCategory: string | null) => {
@@ -40,24 +59,24 @@ const useTools = (searchQuery: string, selectedCategory: string | null) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      let filteredTools = mockTools;
-      
-      if (searchQuery) {
-        filteredTools = filteredTools.filter(tool => 
-          tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          tool.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+    const fetchTools = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        if (searchQuery) params.append('search', searchQuery);
+        if (selectedCategory) params.append('category', selectedCategory);
+        
+        const data = await apiService.get<Tool[]>(`/tools?${params.toString()}`);
+        setTools(data);
+      } catch (err) {
+        console.error('Failed to fetch tools:', err);
+        setTools([]);
+      } finally {
+        setLoading(false);
       }
-      
-      if (selectedCategory) {
-        filteredTools = filteredTools.filter(tool => tool.category.id === selectedCategory);
-      }
-      
-      setTools(filteredTools);
-      setLoading(false);
-    }, 300);
+    };
+
+    fetchTools();
   }, [searchQuery, selectedCategory]);
 
   return { tools, loading };
@@ -68,10 +87,18 @@ const useCategories = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setCategories(mockCategories);
-      setLoading(false);
-    }, 100);
+    const fetchCategories = async () => {
+      try {
+        const data = await apiService.get<Category[]>('/categories');
+        setCategories(data);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
   return { categories, loading };
