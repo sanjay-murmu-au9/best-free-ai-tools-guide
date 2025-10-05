@@ -196,6 +196,7 @@ const useAuth = () => {
 // Components
 const Header: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   return (
@@ -207,13 +208,15 @@ const Header: React.FC = () => {
             <span className="text-xl font-bold text-gray-900">AI Tools Hub</span>
           </Link>
 
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link to="/" className="text-gray-700 hover:text-blue-600">Home</Link>
             <Link to="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
             <Link to="/favorites" className="text-gray-700 hover:text-blue-600">Favorites</Link>
           </nav>
 
-          <div className="flex items-center space-x-4">
+          {/* Desktop Auth */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-700">{user.email}</span>
@@ -230,7 +233,76 @@ const Header: React.FC = () => {
               </button>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                to="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              >
+                Home
+              </Link>
+              <Link
+                to="/categories"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              >
+                Categories
+              </Link>
+              <Link
+                to="/favorites"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              >
+                Favorites
+              </Link>
+              <div className="px-3 py-2">
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="text-sm text-gray-700">{user.email}</div>
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="text-sm text-gray-600 hover:text-gray-800"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setIsAuthModalOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+                  >
+                    Sign in with Google
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
     </header>
