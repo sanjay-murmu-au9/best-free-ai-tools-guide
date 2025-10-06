@@ -1,14 +1,13 @@
-const API_BASE_URL = 'https://digldzbwgoqnwuhpdjuw.supabase.co/functions/v1';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const getHeaders = () => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${(import.meta as any).env.VITE_SUPABASE_ANON_KEY}`,
-  'apikey': (import.meta as any).env.VITE_SUPABASE_ANON_KEY
+  'Content-Type': 'application/json'
 });
 
 export const api = {
-  async getTools() {
-    const response = await fetch(`${API_BASE_URL}/tools`, { headers: getHeaders() });
+  async getTools(params?: string) {
+    const url = params ? `${API_BASE_URL}/tools?${params}` : `${API_BASE_URL}/tools`;
+    const response = await fetch(url, { headers: getHeaders() });
     const data = await response.json();
     return data.success ? data.data : [];
   },

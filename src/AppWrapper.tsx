@@ -432,23 +432,24 @@ const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-200 p-4 sm:p-6 cursor-pointer">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl shadow-sm border flex items-center justify-center flex-shrink-0 overflow-hidden">
-              {tool.logo_url ? (
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-sm border flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <span className="text-white font-bold text-lg sm:text-xl">{tool.name.charAt(0)}</span>
+              {tool.logo_url && (
                 <img 
                   src={tool.logo_url} 
                   alt={`${tool.name} logo`}
-                  className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
-                  onError={(e) => {
+                  className="absolute w-12 h-12 sm:w-16 sm:h-16 object-contain bg-white rounded-xl"
+                  onLoad={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const fallback = target.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.style.background = 'white';
+                      const textSpan = parent.querySelector('span');
+                      if (textSpan) textSpan.style.display = 'none';
+                    }
                   }}
                 />
-              ) : null}
-              <div className={`w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 items-center justify-center rounded-xl ${tool.logo_url ? 'hidden' : 'flex'}`}>
-                <span className="text-white font-bold text-lg sm:text-xl">{tool.name.charAt(0)}</span>
-              </div>
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{tool.name}</h3>

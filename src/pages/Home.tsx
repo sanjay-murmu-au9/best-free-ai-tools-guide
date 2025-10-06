@@ -1,9 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
 import ToolCard from '../components/ToolCard';
 import Newsletter from '../components/Newsletter';
-import { mockTools, categories as mockCategories } from '../lib/mockData';
+import { api } from '../lib/api';
 import { Tool, Category } from '../types';
 
 export default function Home() {
@@ -14,20 +14,47 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Using mock data temporarily
-    setTools(mockTools);
-    setCategories(mockCategories);
-    setLoading(false);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [toolsData, categoriesData] = await Promise.all([
+          api.getTools(),
+          api.getCategories()
+        ]);
+        setTools(toolsData);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
-  const filteredTools = useMemo(() => {
-    return tools.filter(tool => {
-      const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           tool.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = !selectedCategory || tool.category?.id === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [tools, searchQuery, selectedCategory]);
+  // Update tools when search or category changes
+  useEffect(() => {
+    const fetchFilteredTools = async () => {
+      try {
+        const params = new URLSearchParams();
+        if (searchQuery) params.append('search', searchQuery);
+        if (selectedCategory) {
+          const categorySlug = categories.find(c => c.id === selectedCategory)?.slug;
+          if (categorySlug) params.append('category', categorySlug);
+        }
+        
+        const toolsData = await api.getTools(params.toString());
+        setTools(toolsData);
+      } catch (error) {
+        console.error('Failed to fetch filtered tools:', error);
+      }
+    };
+
+    if (categories.length > 0) {
+      fetchFilteredTools();
+    }
+  }, [searchQuery, selectedCategory, categories]);
 
 
 
@@ -83,19 +110,19 @@ export default function Home() {
                 </h2>
                 <p className="text-gray-600">
                   {searchQuery 
-                    ? `${filteredTools.length} tools found for "${searchQuery}"`
-                    : `${filteredTools.length} tools found`
+                    ? `${tools.length} tools found for "${searchQuery}"`
+                    : `${tools.length} tools found`
                   }
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {filteredTools.map(tool => (
+                {tools.map(tool => (
                   <ToolCard key={tool.id} tool={tool} />
                 ))}
               </div>
 
-              {filteredTools.length === 0 && (
+              {tools.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">
                     {searchQuery 
