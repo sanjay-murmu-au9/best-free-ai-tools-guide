@@ -105,24 +105,23 @@ export default function ToolDetail() {
         <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-sm border flex items-center justify-center flex-shrink-0 overflow-hidden relative">
-                <span className="text-white font-bold text-lg sm:text-2xl">{tool.name.charAt(0)}</span>
-                {tool.logo_url && (
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-lg shadow-sm border flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {tool.logo_url ? (
                   <img 
                     src={tool.logo_url} 
                     alt={`${tool.name} logo`}
-                    className="absolute inset-0 w-full h-full object-contain bg-white rounded-lg"
-                    onLoad={(e) => {
+                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
+                    onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.style.background = 'white';
-                        const textSpan = parent.querySelector('span');
-                        if (textSpan) textSpan.style.display = 'none';
-                      }
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
                     }}
                   />
-                )}
+                ) : null}
+                <div className={`w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 items-center justify-center rounded-lg ${tool.logo_url ? 'hidden' : 'flex'}`}>
+                  <span className="text-white font-bold text-lg sm:text-2xl">{tool.name.charAt(0)}</span>
+                </div>
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{tool.name}</h1>
