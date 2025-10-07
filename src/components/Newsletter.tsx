@@ -13,21 +13,15 @@ export default function Newsletter() {
 
     try {
       const data = await api.subscribeNewsletter(email);
-      console.log('Newsletter API response:', data);
       
       if (data.success) {
         setMessage('Successfully subscribed to our newsletter!');
         setEmail('');
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setMessage('');
-        }, 3000);
+        setTimeout(() => setMessage(''), 3000);
+      } else if (data.error === 'Email already subscribed') {
+        setMessage('You are already subscribed!');
       } else {
-        if (data.error === 'Email already subscribed') {
-          setMessage('You are already subscribed!');
-        } else {
-          setMessage(data.error || 'An error occurred. Please try again.');
-        }
+        setMessage(data.error || 'An error occurred. Please try again.');
       }
     } catch (error) {
       console.error('Newsletter subscription error:', error);
